@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - GROUP 3 - BIT102</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        nav {
+            background-color: #007BFF;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        header {
+            text-align: center;
+            padding: 50px 0;
+            background: linear-gradient(135deg, #007BFF, #00C6FF);
+            color: #fff;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        header p {
+            margin: 10px 0 0;
+            font-size: 1.2em;
+        }
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .transaction-form {
+            margin-bottom: 20px;
+        }
+        .transaction-form input, .transaction-form button {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .transaction-form button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .transaction-form button:hover {
+            background-color: #0056b3;
+        }
+        .transactions ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .transactions li {
+            background-color: #f4f4f9;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .transactions button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .transactions button:hover {
+            background-color: #c82333;
+        }
+        .total-amount {
+            margin-top: 20px;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #007BFF;
+            color: #fff;
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.transaction-form form');
+            const transactionsList = document.getElementById('transactions');
+            const totalAmountDisplay = document.getElementById('total-amount');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const description = document.getElementById('description').value;
+                const amount = parseFloat(document.getElementById('amount').value);
+
+                if(description && !isNaN(amount)) {
+                    const transaction = { description, amount };
+                    addTransactionToList(transaction);
+                    saveTransactions();
+                    form.reset();
+                    updateTotalAmount();
+                }
+            });
+
+            function addTransactionToList(transaction) {
+                const li = document.createElement('li');
+                li.textContent = `${transaction.description}: ₱${transaction.amount.toFixed(2)}`;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('delete-btn');
+                deleteButton.addEventListener('click', function() {
+                    li.remove();
+                    deleteTransaction(transaction);
+                    updateTotalAmount();
+                });
+
+                li.appendChild(deleteButton);
+                transactionsList.appendChild(li);
+            }
+
+            function saveTransactions() {
+                const transactions = Array.from(transactionsList.children).map(li => {
+                    const [description, amount] = li.textContent.split(': ₱');
+                    return { description, amount: parseFloat(amount) };
+                });
+
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+            }
+
+            function loadTransactions() {
+                let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+                transactions.forEach(transaction => {
+                    addTransactionToList(transaction);
+                });
+                updateTotalAmount();
+            }
+
+            function deleteTransaction(transactionToDelete) {
+                let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+                transactions = transactions.filter(transaction => {
+                    return transaction.description !== transactionToDelete.description || transaction.amount !== transactionToDelete.amount;
+                });
+
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+            }
+
+            function updateTotalAmount() {
+                let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+                let totalAmount = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+                totalAmountDisplay.textContent = `Total: ₱${totalAmount.toFixed(2)}`;
+            }
+
+            loadTransactions();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="report.html">Report</a>
+            <a href="help.html">Help</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="services.html">Services</a>
+            <a href="team.html">Our Team</a>
+        </nav>
+        <header>
+            <h1>Welcome to GROUP 3 - BIT102</h1>
+            <p>Your trusted partner in accounting information systems</p>
+        </header>
+        <div class="content">
+            <div class="transaction-form">
+                <h2>Add Transaction</h2>
+                <form>
+                    <input type="text" id="description" placeholder="Description" required>
+                    <input type="number" id="amount" placeholder="Amount (₱)" required>
+                    <button type="submit">Add Transaction</button>
+                </form>
+            </div>
+            <div class="transactions">
+                <h2>Transactions</h2>
+                <ul id="transactions"></ul>
+            </div>
+            <div class="total-amount" id="total-amount">Total: ₱0.00</div>
+        </div>
+        <footer>GROUP 3 - BIT102</footer>
+    </div>
+</body>
+</html>
